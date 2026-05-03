@@ -27,11 +27,14 @@ miniLab1 é uma ferramenta web que transforma uma imagem de produto em uma campa
 6. Copie os outputs por canal e use nas plataformas
 ```
 
-O processamento usa um pipeline de dois agentes de IA:
-- **Agente de visão** (`llama-4-scout-17b`) — analisa a imagem e extrai atributos do produto (tipo, cores, estilo, materiais)
-- **Agente de texto** (`llama-3.3-70b`) — recebe os atributos + contexto do usuário e gera as copies para cada canal
+O processamento usa um **pipeline de dois agentes de IA**:
 
-Os prompts dos agentes seguem os frameworks **COSTAR** (contexto, objetivo, estilo, tom, audiência, resposta) e **PASSEF** (persona, ação, contexto, exemplos few-shot, formato), documentados em [`backend/src/prompts/`](backend/src/prompts/).
+| Agente | Modelo | Função |
+|--------|--------|--------|
+| Visão | `llama-4-scout-17b-16e-instruct` | Analisa a imagem e extrai atributos (tipo, cores, estilo, materiais) |
+| Texto | `llama-3.3-70b-versatile` | Recebe os atributos + contexto e gera copies para os três canais |
+
+Os prompts seguem os frameworks **COSTAR** e **PASSEF**, documentados em [`backend/src/prompts/`](backend/src/prompts/).
 
 ---
 
@@ -60,6 +63,73 @@ Os prompts dos agentes seguem os frameworks **COSTAR** (contexto, objetivo, esti
 
 ---
 
+## Demonstração
+
+### Verificar se o backend está no ar
+
+```bash
+curl http://localhost:3001/health
+# {"status":"ok"}
+```
+
+### Gerar campanha via curl
+
+```bash
+curl -X POST http://localhost:3001/api/generate \
+  -H "x-api-key: gsk_SUA_CHAVE_GROQ" \
+  -F "image=@produto.jpg" \
+  -F "product_name=Tênis Air Run Pro" \
+  -F "highlight=Edição limitada" \
+  -F "tone=urgente" \
+  -F "target_audience=Jovens 18-30"
+```
+
+**Resposta esperada:**
+
+```json
+{
+  "success": true,
+  "data": {
+    "instagram": {
+      "feed_caption": "Seu próximo passo começa aqui...",
+      "stories_text": "Só hoje. Só agora.",
+      "hashtags": ["#tenis", "#lifestyle", "#edicaolimitada"],
+      "suggested_format": "carrossel"
+    },
+    "tiktok": {
+      "hook": "Você ainda não viu o tênis que vai mudar tudo...",
+      "script": "...",
+      "cta": "Clica no link da bio",
+      "hashtags": ["#tenis", "#moda"],
+      "trend_suggestion": "Get Ready With Me"
+    },
+    "google_ads": {
+      "headline_main": "Tênis Air Run Pro",
+      "headline_alt_1": "Edição Limitada",
+      "headline_alt_2": "Compre Antes que Acabe",
+      "description": "Estilo e performance numa edição exclusiva. Garanta o seu agora.",
+      "cta": "Compre Agora"
+    }
+  }
+}
+```
+
+> Um exemplo real de campanha gerada está em [`evidence/`](evidence/).
+
+---
+
+## Tecnologias
+
+| Camada | Stack |
+|--------|-------|
+| Backend | Node.js 18, Express, Multer |
+| Frontend | React 18, Vite, Tailwind CSS, Zustand |
+| IA | Groq SDK — `llama-4-scout-17b` (visão) + `llama-3.3-70b` (texto) |
+| Testes | Jest, Supertest |
+| Prompt Engineering | COSTAR + PASSEF |
+
+---
+
 ## Pré-requisitos
 
 - [Node.js](https://nodejs.org) 18 ou superior
@@ -70,49 +140,53 @@ Os prompts dos agentes seguem os frameworks **COSTAR** (contexto, objetivo, esti
 
 ## Como rodar localmente
 
-### 1. Clone o repositório
+### Usando Make (Linux/macOS/WSL/Git Bash)
 
 ```bash
 git clone https://github.com/guipissolatto/miniLab1.git
 cd miniLab1
+make install
+make run          # backend em http://localhost:3001
 ```
-
-### 2. Configure o backend
-
-```bash
-cd backend
-npm install
-cp .env.example .env
-```
-
-Edite o `.env` se quiser ajustar porta ou temperaturas dos agentes. A API Key **não** vai no `.env` — ela é inserida pelo usuário na interface.
-
-```bash
-npm run dev        # inicia em http://localhost:3001
-```
-
-### 3. Configure o frontend
 
 Em outro terminal:
 
 ```bash
-cd frontend
-npm install
-npm run dev        # inicia em http://localhost:5173
+cd frontend && npm run dev    # frontend em http://localhost:5173
 ```
 
-### 4. Acesse
+### Manualmente (Windows PowerShell)
 
-Abra [http://localhost:5173](http://localhost:5173), insira sua API Key do Groq e envie uma imagem de produto.
+```bash
+git clone https://github.com/guipissolatto/miniLab1.git
+cd miniLab1
+
+# Backend
+cd backend
+npm install
+cp .env.example .env   # ajuste se necessário
+npm run dev
+
+# Frontend (outro terminal)
+cd frontend
+npm install
+npm run dev
+```
+
+Acesse [http://localhost:5173](http://localhost:5173).
 
 ---
 
 ## Rodando os testes
 
 ```bash
+# Via Make
+make test
+
+# Via npm
 cd backend
-npm test                  # todos os testes
-npm run test:coverage     # com relatório de cobertura
+npm test                   # todos os testes
+npm run test:coverage      # com relatório de cobertura
 ```
 
 ---
@@ -121,22 +195,24 @@ npm run test:coverage     # com relatório de cobertura
 
 ```
 miniLab1/
+├── Makefile                       # comandos: install, run, test, format
 ├── backend/
 │   ├── src/
-│   │   ├── prompts/          # prompts COSTAR+PASSEF dos agentes (.md)
-│   │   ├── services/         # image-analyzer e campaign-generator
-│   │   ├── routes/           # POST /api/generate
-│   │   ├── handlers/         # upload com multer
-│   │   ├── formatters/       # normalização da resposta
-│   │   └── utils/            # prompt-loader
-│   └── tests/                # 21 testes (unitários + integração)
+│   │   ├── prompts/               # prompts COSTAR+PASSEF dos agentes (.md)
+│   │   ├── services/              # image-analyzer e campaign-generator
+│   │   ├── routes/                # POST /api/generate
+│   │   ├── handlers/              # upload com multer (memoryStorage)
+│   │   ├── formatters/            # normalização e envelope de resposta
+│   │   └── utils/                 # prompt-loader
+│   ├── tests/                     # 21 testes (unitários + integração)
+│   └── .env.example               # variáveis de ambiente documentadas
 ├── frontend/
 │   └── src/
-│       ├── components/       # Form, Upload, Results, ChannelSelector
-│       ├── store/            # estado global com Zustand
-│       └── utils/            # client HTTP
-├── docs/                     # PRD, arquitetura, casos de uso, datamodel
-├── evidence/                 # JSON de campanha real gerada no teste do MVP
+│       ├── components/            # Form, Upload, Results, ChannelSelector
+│       ├── store/                 # estado global com Zustand
+│       └── utils/                 # client HTTP (fetch + FormData)
+├── docs/                          # PRD, arquitetura, casos de uso, datamodel
+├── evidence/                      # JSON de campanha real gerada no teste do MVP
 └── README.md
 ```
 
@@ -154,7 +230,47 @@ miniLab1/
 | Utils | 100% | 100% | 100% |
 | **Total** | **96.4%** | **100%** | **98.7%** |
 
-21 testes distribuídos em 6 suites. Testes de integração da rota principal cobertos com `supertest`.
+21 testes em 6 suites — unitários e integração com `supertest`.
+
+---
+
+## Desenvolvido com IA generativa
+
+### Como a IA acelerou o desenvolvimento
+
+O projeto foi desenvolvido com **Claude Code** como copiloto principal. O maior ganho de produtividade não foi na geração de código em si, mas na capacidade de tomar decisões arquiteturais mais rápido.
+
+O fluxo adotado:
+1. **PRD detalhado primeiro** — visão do produto, problema, público-alvo, escopo do MVP e critérios de sucesso foram definidos em texto antes de qualquer código
+2. **Diagramas gerados a partir da descrição** — arquitetura, casos de uso e datamodel criados com Mermaid a partir do PRD
+3. **Prompts com COSTAR + PASSEF** — os agentes de IA receberam prompts estruturados com contexto, objetivo, estilo e exemplos few-shot, o que eliminou a variação nas respostas e tornou o pipeline previsível
+4. **Implementação incremental com testes** — cada serviço foi implementado com testes unitários antes de avançar para o próximo
+
+### Ferramentas utilizadas
+
+- **Claude Code** — copiloto de desenvolvimento (geração de código, revisão, testes)
+- **Groq** — provider de IA generativa (free tier, sem cartão de crédito)
+- **COSTAR** — framework de prompt engineering: Contexto, Objetivo, Estilo, Tom, Audiência, Resposta
+- **PASSEF** — framework complementar: Persona, Ação, Contexto, Exemplos (few-shot), Formato
+
+### Desafios superados
+
+O maior obstáculo técnico foi a **migração de provider de IA**. A sequência foi:
+- **Anthropic Claude** → sem créditos disponíveis
+- **Google Gemini 2.0** → limite de requisições zerado no projeto
+- **Google Gemini 1.5** → inúmeros erros de formato e versão de API
+- **Groq** → funcionou com free tier real, sem restrições
+
+Cada troca exigiu refatorar os serviços, ajustar os mocks nos testes e adaptar os prompts ao comportamento do novo modelo. A lição foi clara: uma **abstração de provider desde o início** teria economizado tempo significativo.
+
+Outro desafio foi a **extração de JSON das respostas**: modelos generativos frequentemente envolvem o JSON em blocos markdown (` ```json ``` `) mesmo quando o prompt pede resposta bruta. Foi necessário implementar um parser defensivo nos dois agentes.
+
+### Lições aprendidas
+
+- **A IA executa bem, mas não decide por você.** Em vários momentos ela propôs abstrações desnecessárias para um MVP. Foi preciso lembrá-la do escopo constantemente.
+- **Testes são a rede de segurança.** Sem cobertura de testes, cada refatoração (especialmente as trocas de provider) seria arriscada. Com 96% de cobertura, cada mudança podia ser validada com confiança.
+- **Entender antes de commitar.** Aceitar sugestões da IA sem compreendê-las cria dívida técnica silenciosa. O hábito de revisar cada bloco gerado antes do commit foi essencial para manter a qualidade.
+- **PRD bem feito vale mais que prompt bem feito.** Quanto mais claro o contexto antes de começar, menos correções foram necessárias durante a implementação.
 
 ---
 
@@ -186,6 +302,12 @@ miniLab1/
 `MVP funcional` · Versão 1.0 · Maio 2026
 
 Provider de IA: **Groq** (free tier) · Modelos: `llama-4-scout-17b` (visão) + `llama-3.3-70b` (texto)
+
+---
+
+## Licença
+
+Distribuído sob a licença MIT. Veja [LICENSE](LICENSE) para mais detalhes.
 
 ---
 

@@ -1,3 +1,11 @@
+/**
+ * Normaliza a resposta de campanha gerada pela IA em um envelope padronizado.
+ * Garante que todos os campos existam com valores padrão, evitando null/undefined
+ * no payload enviado ao frontend.
+ *
+ * @param {Object} campaign - Objeto de campanha retornado pelo campaign-generator.
+ * @returns {{ success: true, data: Object }} Envelope com os dados normalizados.
+ */
 function formatCampaignResponse(campaign) {
   return {
     success: true,
@@ -26,6 +34,13 @@ function formatCampaignResponse(campaign) {
   }
 }
 
+/**
+ * Cria um envelope de erro padronizado para respostas da API.
+ *
+ * @param {string} message - Mensagem de erro legível pelo usuário.
+ * @param {number} [statusCode=500] - Código HTTP do erro.
+ * @returns {{ success: false, error: { message: string, statusCode: number } }}
+ */
 function formatErrorResponse(message, statusCode = 500) {
   return {
     success: false,
