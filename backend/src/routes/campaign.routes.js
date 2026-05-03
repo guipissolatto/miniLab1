@@ -40,7 +40,9 @@ router.post('/generate', upload.single('image'), async (req, res) => {
 
     return res.status(200).json(formatCampaignResponse(campaign))
   } catch (err) {
-    console.error('[ERROR]', err.status, err.message)
+    console.error('[ERROR STATUS]', err.status)
+    console.error('[ERROR MESSAGE]', err.message)
+    console.error('[ERROR STACK]', err.stack)
     const statusCode = err.status || 500
     let message = 'Erro interno ao gerar campanha.'
 

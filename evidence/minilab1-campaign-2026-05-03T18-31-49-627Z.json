@@ -1,0 +1,45 @@
+{
+  "generated_at": "2026-05-03T18:31:49.627Z",
+  "model_vision": "meta-llama/llama-4-scout-17b-16e-instruct",
+  "model_copy": "llama-3.3-70b-versatile",
+  "provider": "Groq",
+  "campaign": {
+    "instagram": {
+      "feed_caption": "Elevate seu estilo esportivo com o Tenis Nike Pro Run, uma edição especial que combina desempenho superior com elegância sofisticada. Com um desconto exclusivo de 40%, não perca a chance de adquirir este modelo icônico. \n\nDestaque: \n- Desenho colorblock preto e branco moderno \n- Logotipo Nike Swoosh em vermelho, um toque de distinção \n- Unidade de ar visível no calcanhar, tecnologia de ponta para amortecimento \n\nAproveite esta oportunidade única. Link na bio para comprar agora.",
+      "stories_text": "Desconto exclusivo: 40% no Tenis Nike Pro Run. Elegância esportiva, desempenho de elite. Compre agora e eleve seu jogo.",
+      "hashtags": [
+        "tenisnike",
+        "nikeprorun",
+        "edicaoespecial",
+        "descontoexclusivo",
+        "modaesportiva",
+        "sneakers",
+        "nike",
+        "tenisdecorrida",
+        "esportivo",
+        "elegancia"
+      ],
+      "suggested_format": "feed"
+    },
+    "tiktok": {
+      "hook": "Quer correr como um profissional? Tem um desconto de 40% para começar.",
+      "script": "[Mostrar o tênis de diferentes ângulos, com música dinâmica ao fundo] Você está pronto para elevar seu desempenho esportivo? [Zoom no logotipo Nike Swoosh] Com o Tenis Nike Pro Run, você não apenas corre, você voa. [Corte para uma pessoa correndo, com o tênis visível] E agora, com 40% de desconto, é a chance perfeita de adquirir este modelo icônico. [Texto na tela: COMPRE AGORA, LINK NA BIO] Não deixe essa oportunidade passar.",
+      "cta": "Compre agora e sinta a diferença.",
+      "hashtags": [
+        "nikeprorun",
+        "descontoespecial",
+        "tenisdesportivo",
+        "corrida",
+        "esportivo"
+      ],
+      "trend_suggestion": "Vídeo dinâmico com cortes rápidos, mostrando o tênis em ação, com uma música eletrônica animada"
+    },
+    "google_ads": {
+      "headline_main": "Tenis Nike Pro Run - 40% Off",
+      "headline_alt_1": "Edição Especial Nike",
+      "headline_alt_2": "Desempenho de Elite, Preço Especial",
+      "description": "Tenis Nike Pro Run, edição especial com 40% de desconto. Desempenho superior, estilo esportivo elegante. Compre agora.",
+      "cta": "Compre Agora"
+    }
+  }
+}
