@@ -11,10 +11,11 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "@google/generative-ai": "^0.24.1",
+    "@google/genai": "^1.51.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "groq-sdk": "^1.1.2",
     "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {

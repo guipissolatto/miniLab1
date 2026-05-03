@@ -1,4 +1,4 @@
-const { GoogleGenerativeAI } = require('@google/generative-ai')
+const Groq = require('groq-sdk')
 const { loadPrompt } = require('../utils/prompt-loader')
 
 function extractJson(text) {
@@ -7,24 +7,32 @@ function extractJson(text) {
 }
 
 async function analyzeImage(imageBase64, mimeType, apiKey) {
-  const genAI = new GoogleGenerativeAI(apiKey)
+  const client = new Groq({ apiKey })
   const systemPrompt = loadPrompt('image-analyzer.md')
 
-  const model = genAI.getGenerativeModel({
-    model: 'gemini-2.0-flash',
-    systemInstruction: systemPrompt,
-    generationConfig: {
-      temperature: parseFloat(process.env.IMAGE_ANALYZER_TEMPERATURE || '0.1'),
-      maxOutputTokens: 1024,
-    },
+  const response = await client.chat.completions.create({
+    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+    temperature: parseFloat(process.env.IMAGE_ANALYZER_TEMPERATURE || '0.1'),
+    max_tokens: 1024,
+    messages: [
+      { role: 'system', content: systemPrompt },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'image_url',
+            image_url: { url: `data:${mimeType};base64,${imageBase64}` },
+          },
+          {
+            type: 'text',
+            text: 'Analyze this product image and return the structured JSON.',
+          },
+        ],
+      },
+    ],
   })
 
-  const result = await model.generateContent([
-    { inlineData: { data: imageBase64, mimeType } },
-    'Analyze this product image and return the structured JSON.',
-  ])
-
-  const raw = extractJson(result.response.text())
+  const raw = extractJson(response.choices[0].message.content)
 
   try {
     return JSON.parse(raw)
