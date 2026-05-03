@@ -18,10 +18,16 @@ router.post('/generate', upload.single('image'), async (req, res) => {
       return res.status(400).json(formatErrorResponse('Nome do produto obrigatório.', 400))
     }
 
+    const apiKey = req.headers['x-api-key'] || process.env.ANTHROPIC_API_KEY
+
+    if (!apiKey) {
+      return res.status(400).json(formatErrorResponse('API Key obrigatória.', 400))
+    }
+
     const imageBase64 = toBase64(req.file.buffer)
     const mimeType = req.file.mimetype
 
-    const productAttributes = await analyzeImage(imageBase64, mimeType)
+    const productAttributes = await analyzeImage(imageBase64, mimeType, apiKey)
 
     const userContext = {
       product_name,
@@ -30,7 +36,7 @@ router.post('/generate', upload.single('image'), async (req, res) => {
       target_audience: target_audience || null,
     }
 
-    const campaign = await generateCampaign(productAttributes, userContext)
+    const campaign = await generateCampaign(productAttributes, userContext, apiKey)
 
     return res.status(200).json(formatCampaignResponse(campaign))
   } catch (err) {

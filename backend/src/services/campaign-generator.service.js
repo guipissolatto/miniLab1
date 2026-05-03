@@ -1,9 +1,8 @@
 const Anthropic = require('@anthropic-ai/sdk')
 const { loadPrompt } = require('../utils/prompt-loader')
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
-async function generateCampaign(productAttributes, userContext) {
+async function generateCampaign(productAttributes, userContext, apiKey) {
+  const client = new Anthropic({ apiKey: apiKey || process.env.ANTHROPIC_API_KEY })
   const systemPrompt = loadPrompt('campaign-generator.md')
 
   const userMessage = JSON.stringify({ product_attributes: productAttributes, user_context: userContext }, null, 2)

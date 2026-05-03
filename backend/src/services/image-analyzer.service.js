@@ -1,9 +1,8 @@
 const Anthropic = require('@anthropic-ai/sdk')
 const { loadPrompt } = require('../utils/prompt-loader')
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
-async function analyzeImage(imageBase64, mimeType) {
+async function analyzeImage(imageBase64, mimeType, apiKey) {
+  const client = new Anthropic({ apiKey: apiKey || process.env.ANTHROPIC_API_KEY })
   const systemPrompt = loadPrompt('image-analyzer.md')
 
   const response = await client.messages.create({
@@ -42,3 +41,4 @@ async function analyzeImage(imageBase64, mimeType) {
 }
 
 module.exports = { analyzeImage }
+

@@ -26,16 +26,16 @@
 
 | # | Task | Status |
 |---|------|--------|
-| 11 | `package.json` + dependências | ⬜ |
-| 12 | Configurar Vite + Tailwind | ⬜ |
-| 13 | `src/main.jsx` + `App.jsx` | ⬜ |
-| 14 | `components/Upload` (drag & drop) | ⬜ |
-| 15 | `components/Form` (nome, tom, público, API key) | ⬜ |
-| 16 | `components/ChannelSelector` (abas) | ⬜ |
-| 17 | `components/Results` (copies + botão copiar) | ⬜ |
-| 18 | `hooks/useGenerateCampaign.js` | ⬜ |
-| 19 | `store/campaign.store.js` (Zustand) | ⬜ |
-| 20 | `utils/api.js` (wrapper fetch) | ⬜ |
+| 11 | `package.json` + dependências | ✅ |
+| 12 | Configurar Vite + Tailwind | ✅ |
+| 13 | `src/main.jsx` + `App.jsx` | ✅ |
+| 14 | `components/Upload` (drag & drop) | ✅ |
+| 15 | `components/Form` (nome, tom, público, API key) | ✅ |
+| 16 | `components/ChannelSelector` (abas) | ✅ |
+| 17 | `components/Results` (copies + botão copiar) | ✅ |
+| 18 | `hooks/useGenerateCampaign.js` | ✅ |
+| 19 | `store/campaign.store.js` (Zustand) | ✅ |
+| 20 | `utils/api.js` (wrapper fetch) | ✅ |
 
 ---
 
