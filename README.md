@@ -19,13 +19,19 @@ miniLab1 é uma ferramenta web que transforma uma imagem de produto em uma campa
 ## Como funciona
 
 ```
-1. Acesse a ferramenta (sem login)
+1. Acesse http://localhost:5173 (sem login)
 2. Insira sua API Key (Groq — gratuita em console.groq.com)
 3. Faça upload da foto do produto (JPG, PNG ou WebP, até 5 MB)
 4. Informe o nome e contexto do produto
 5. Clique em "Gerar Campanha"
 6. Copie os outputs por canal e use nas plataformas
 ```
+
+O processamento usa um pipeline de dois agentes de IA:
+- **Agente de visão** (`llama-4-scout-17b`) — analisa a imagem e extrai atributos do produto (tipo, cores, estilo, materiais)
+- **Agente de texto** (`llama-3.3-70b`) — recebe os atributos + contexto do usuário e gera as copies para cada canal
+
+Os prompts dos agentes seguem os frameworks **COSTAR** (contexto, objetivo, estilo, tom, audiência, resposta) e **PASSEF** (persona, ação, contexto, exemplos few-shot, formato), documentados em [`backend/src/prompts/`](backend/src/prompts/).
 
 ---
 
@@ -54,13 +60,85 @@ miniLab1 é uma ferramenta web que transforma uma imagem de produto em uma campa
 
 ---
 
-## Fora do escopo (MVP)
+## Pré-requisitos
 
-- Login ou autenticação de usuários
-- Histórico de campanhas
-- Publicação automática nas plataformas
-- Geração de imagens ou vídeos
-- Versão mobile nativa
+- [Node.js](https://nodejs.org) 18 ou superior
+- npm 9+
+- API Key gratuita do [Groq](https://console.groq.com)
+
+---
+
+## Como rodar localmente
+
+### 1. Clone o repositório
+
+```bash
+git clone https://github.com/guipissolatto/miniLab1.git
+cd miniLab1
+```
+
+### 2. Configure o backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+```
+
+Edite o `.env` se quiser ajustar porta ou temperaturas dos agentes. A API Key **não** vai no `.env` — ela é inserida pelo usuário na interface.
+
+```bash
+npm run dev        # inicia em http://localhost:3001
+```
+
+### 3. Configure o frontend
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev        # inicia em http://localhost:5173
+```
+
+### 4. Acesse
+
+Abra [http://localhost:5173](http://localhost:5173), insira sua API Key do Groq e envie uma imagem de produto.
+
+---
+
+## Rodando os testes
+
+```bash
+cd backend
+npm test                  # todos os testes
+npm run test:coverage     # com relatório de cobertura
+```
+
+---
+
+## Estrutura do projeto
+
+```
+miniLab1/
+├── backend/
+│   ├── src/
+│   │   ├── prompts/          # prompts COSTAR+PASSEF dos agentes (.md)
+│   │   ├── services/         # image-analyzer e campaign-generator
+│   │   ├── routes/           # POST /api/generate
+│   │   ├── handlers/         # upload com multer
+│   │   ├── formatters/       # normalização da resposta
+│   │   └── utils/            # prompt-loader
+│   └── tests/                # 21 testes (unitários + integração)
+├── frontend/
+│   └── src/
+│       ├── components/       # Form, Upload, Results, ChannelSelector
+│       ├── store/            # estado global com Zustand
+│       └── utils/            # client HTTP
+├── docs/                     # PRD, arquitetura, casos de uso, datamodel
+├── evidence/                 # JSON de campanha real gerada no teste do MVP
+└── README.md
+```
 
 ---
 
@@ -80,11 +158,21 @@ miniLab1 é uma ferramenta web que transforma uma imagem de produto em uma campa
 
 ---
 
+## Fora do escopo (MVP)
+
+- Login ou autenticação de usuários
+- Histórico de campanhas
+- Publicação automática nas plataformas
+- Geração de imagens ou vídeos
+- Versão mobile nativa
+
+---
+
 ## Próximos passos (pós-MVP)
 
 | Prioridade | Feature |
 |-----------|---------|
-| Alta | **Geração de imagens** — a partir dos atributos visuais extraídos, gerar uma imagem de campanha pronta para uso (ex: banner para feed do Instagram) usando modelos de geração como DALL·E ou Stable Diffusion |
+| Alta | **Geração de imagens** — usar os atributos visuais extraídos para gerar um banner de campanha pronto (ex: feed do Instagram) via DALL·E ou Stable Diffusion |
 | Alta | Histórico de campanhas geradas por sessão |
 | Média | Exportar campanha em formato editável (PDF / Google Slides) |
 | Média | Sugestão automática de tom e público-alvo com base na imagem |
