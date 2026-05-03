@@ -6,13 +6,23 @@ export async function generateCampaign(file, fields) {
   if (fields.tone) formData.append('tone', fields.tone)
   if (fields.target_audience) formData.append('target_audience', fields.target_audience)
 
-  const response = await fetch('/api/generate', {
-    method: 'POST',
-    headers: { 'x-api-key': fields.api_key },
-    body: formData,
-  })
+  let response
+  try {
+    response = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'x-api-key': fields.api_key.trim() },
+      body: formData,
+    })
+  } catch {
+    throw new Error('Não foi possível conectar ao servidor. Verifique se o backend está rodando.')
+  }
 
-  const json = await response.json()
+  let json
+  try {
+    json = await response.json()
+  } catch {
+    throw new Error(`Erro do servidor (${response.status}). Verifique o terminal do backend.`)
+  }
 
   if (!response.ok) {
     throw new Error(json.error?.message || 'Erro ao gerar campanha.')

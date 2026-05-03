@@ -18,7 +18,7 @@ router.post('/generate', upload.single('image'), async (req, res) => {
       return res.status(400).json(formatErrorResponse('Nome do produto obrigatório.', 400))
     }
 
-    const apiKey = req.headers['x-api-key'] || process.env.ANTHROPIC_API_KEY
+    const apiKey = (req.headers['x-api-key'] || process.env.GEMINI_API_KEY || '').trim()
 
     if (!apiKey) {
       return res.status(400).json(formatErrorResponse('API Key obrigatória.', 400))
@@ -40,9 +40,15 @@ router.post('/generate', upload.single('image'), async (req, res) => {
 
     return res.status(200).json(formatCampaignResponse(campaign))
   } catch (err) {
-    const isApiError = err.status && err.message
-    const statusCode = isApiError ? err.status : 500
-    const message = isApiError ? err.message : 'Erro interno ao gerar campanha.'
+    console.error('[ERROR]', err.status, err.message)
+    const statusCode = err.status || 500
+    let message = 'Erro interno ao gerar campanha.'
+
+    if (err.status === 400 && err.message?.toLowerCase().includes('api key')) message = 'API Key inválida. Verifique sua chave do Google Gemini em aistudio.google.com.'
+    else if (err.status === 403) message = 'API Key sem permissão. Verifique se a chave está ativa em aistudio.google.com.'
+    else if (err.status === 429) message = 'Limite de requisições atingido. Aguarde alguns segundos e tente novamente.'
+    else if (err.message) message = err.message
+
     return res.status(statusCode).json(formatErrorResponse(message, statusCode))
   }
 })
