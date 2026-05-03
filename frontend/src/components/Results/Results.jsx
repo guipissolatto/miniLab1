@@ -85,13 +85,45 @@ function GoogleAdsTab({ data }) {
   )
 }
 
+function DownloadJsonButton({ campaign }) {
+  function handleDownload() {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-')
+    const evidence = {
+      generated_at: new Date().toISOString(),
+      model_vision: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model_copy: 'llama-3.3-70b-versatile',
+      provider: 'Groq',
+      campaign,
+    }
+    const blob = new Blob([JSON.stringify(evidence, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `minilab1-campaign-${timestamp}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <button
+      onClick={handleDownload}
+      className="text-xs text-gray-500 hover:text-gray-700 border border-gray-300 hover:border-gray-400 rounded-lg px-3 py-1.5 transition-colors"
+    >
+      Baixar JSON
+    </button>
+  )
+}
+
 export default function Results() {
   const campaign = useCampaignStore((s) => s.campaign)
   const [activeChannel, setActiveChannel] = useState('instagram')
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 space-y-5">
-      <h2 className="text-base font-semibold text-gray-800">Campanha gerada</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-base font-semibold text-gray-800">Campanha gerada</h2>
+        <DownloadJsonButton campaign={campaign} />
+      </div>
       <ChannelSelector active={activeChannel} onChange={setActiveChannel} />
 
       <div className="pt-2">
