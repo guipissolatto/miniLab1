@@ -1,8 +1,8 @@
 const mockCreate = jest.fn()
 
-jest.mock('@anthropic-ai/sdk', () => {
+jest.mock('groq-sdk', () => {
   return jest.fn().mockImplementation(() => ({
-    messages: { create: mockCreate },
+    chat: { completions: { create: mockCreate } },
   }))
 })
 
@@ -24,20 +24,31 @@ describe('analyzeImage', () => {
     }
 
     mockCreate.mockResolvedValue({
-      content: [{ text: JSON.stringify(fakeAttributes) }],
+      choices: [{ message: { content: JSON.stringify(fakeAttributes) } }],
     })
 
-    const result = await analyzeImage('base64string', 'image/jpeg')
+    const result = await analyzeImage('base64string', 'image/jpeg', 'gsk_test')
     expect(result.product_type).toBe('sneaker')
     expect(result.confidence).toBe('high')
   })
 
-  it('lança erro quando a API retorna JSON inválido', async () => {
+  it('extrai JSON de resposta com bloco markdown', async () => {
+    const fakeAttributes = { product_type: 'bag', confidence: 'medium' }
+
     mockCreate.mockResolvedValue({
-      content: [{ text: 'resposta inválida' }],
+      choices: [{ message: { content: '```json\n' + JSON.stringify(fakeAttributes) + '\n```' } }],
     })
 
-    await expect(analyzeImage('base64string', 'image/jpeg')).rejects.toThrow(
+    const result = await analyzeImage('base64string', 'image/jpeg', 'gsk_test')
+    expect(result.product_type).toBe('bag')
+  })
+
+  it('lança erro quando a API retorna JSON inválido', async () => {
+    mockCreate.mockResolvedValue({
+      choices: [{ message: { content: 'resposta inválida' } }],
+    })
+
+    await expect(analyzeImage('base64string', 'image/jpeg', 'gsk_test')).rejects.toThrow(
       'Image Analyzer returned invalid JSON'
     )
   })
