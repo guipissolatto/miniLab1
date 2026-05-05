@@ -211,10 +211,24 @@ miniLab1/
 │       ├── components/            # Form, Upload, Results, ChannelSelector
 │       ├── store/                 # estado global com Zustand
 │       └── utils/                 # client HTTP (fetch + FormData)
-├── docs/                          # PRD, arquitetura, casos de uso, datamodel
+├── docs/                          # PRD, arquitetura, casos de uso, datamodel, user stories
 ├── evidence/                      # JSON de campanha real gerada no teste do MVP
+├── TASKS.md                       # todas as tasks do projeto com status
 └── README.md
 ```
+
+---
+
+## Documentação
+
+| Documento | Descrição |
+|-----------|-----------|
+| [User Stories](docs/user-stories.md) | US com persona, critérios e matriz de rastreabilidade US × Tasks |
+| [TASKS.md](TASKS.md) | 39 tasks do projeto organizadas por categoria, todas concluídas |
+| [PRD](docs/miniLab1_PRD.md) | Product Requirements Document — visão, escopo e critérios de sucesso |
+| [Arquitetura](docs/architecture.md) | Diagrama e descrição das camadas do sistema |
+| [Casos de uso](docs/use_cases.md) | Fluxos principais da aplicação |
+| [Modelo de dados](docs/datamodel.md) | Estrutura dos objetos trafegados entre os agentes |
 
 ---
 
