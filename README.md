@@ -38,6 +38,71 @@ Os prompts seguem os frameworks **COSTAR** e **PASSEF**, documentados em [`backe
 
 ---
 
+
+---
+
+## Discovery de documentação arquitetural
+
+Esta seção apresenta uma pequena fase de discovery de documentação do sistema **miniLab1**, utilizando a abordagem **diagrams as code** com Mermaid.
+
+A ideia é documentar o sistema de forma versionável, revisável e reutilizável, para que no futuro essa documentação possa servir como contexto para agentes de IA apoiarem novas evoluções do projeto sem inventar decisões arquiteturais.
+
+---
+
+## Descrição do sistema
+
+O **miniLab1** é uma aplicação web que gera campanhas de marketing com apoio de IA generativa a partir de uma imagem de produto.
+
+O usuário acessa a interface web, informa sua API Key da Groq, envia uma imagem do produto e preenche algumas informações de contexto, como nome do produto, destaque, tom da comunicação e público-alvo.
+
+A partir dessas informações, o sistema executa um pipeline com dois agentes de IA:
+
+1. Um agente de visão, que analisa a imagem e extrai atributos visuais do produto;
+2. Um agente de texto, que usa esses atributos e o contexto informado para gerar copies para Instagram, TikTok e Google Ads.
+
+O público principal do sistema são pequenos empreendedores, lojistas e criadores de conteúdo que precisam criar campanhas de marketing de forma rápida, sem depender de uma equipe especializada.
+
+---
+
+## Escopo da visão
+
+Esta documentação está em um nível arquitetural inicial, próximo de uma visão de containers inspirada no modelo C4.
+
+O objetivo não é detalhar cada função ou classe do código, mas mostrar os principais blocos do sistema, suas responsabilidades, integrações e fluxo principal de funcionamento.
+
+---
+
+## Limites e responsabilidades
+
+O sistema é responsável por:
+
+- Receber imagem e contexto do produto;
+- Validar os dados enviados pelo usuário;
+- Enviar a imagem para análise por IA;
+- Gerar textos de campanha para Instagram, TikTok e Google Ads;
+- Retornar os conteúdos organizados por canal;
+- Não armazenar a API Key informada pelo usuário.
+
+Fica fora do escopo do MVP:
+
+- Login ou autenticação de usuários;
+- Histórico de campanhas;
+- Banco de dados;
+- Publicação automática nas redes sociais;
+- Geração de imagens ou vídeos;
+- Integração direta com Instagram, TikTok ou Google Ads.
+
+---
+
+## Integrações
+
+A principal integração externa do sistema é com a **Groq API**, utilizada como provider de IA generativa.
+
+Internamente, o frontend se comunica com o backend por meio da rota:
+
+```http
+POST /api/generate
+
 ## Outputs gerados
 
 | Canal | Conteúdo |
